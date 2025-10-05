@@ -13,6 +13,9 @@
 #include <sys/errno.h>
 
 #include "fifo.h"
+#include "sjf.h"
+#include "rr.h"
+#include "mlfq.h"
 
 #include "msg.h"
 #include "queue.h"
@@ -231,15 +234,7 @@ void check_blocked_queue(queue_t * blocked_queue, queue_t * command_queue, uint3
     }
 }
 
-static const char *SCHEDULER_NAMES[] = {
-    "FIFO",
-/*
-    "SJF",
-    "RR",
-    "MLFQ",
-*/
-    NULL
-};
+static const char *SCHEDULER_NAMES[] = { "FIFO", "SJF", "RR", "MLFQ", NULL };
 
 typedef enum  {
     NULL_SCHEDULER = -1,
@@ -291,6 +286,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     printf("Scheduler server listening on %s...\n", SOCKET_PATH);
+    uint32_t rr_quantum_used = 0;
+mlfq_t mlfq;
+mlfq_init(&mlfq);
+int mlfq_cpu_queue = 0;
+uint32_t mlfq_quantum_used = 0;
+
     uint32_t current_time_ms = 0;
     while (1) {
         // Check for new connections and/or instructions
@@ -310,7 +311,15 @@ int main(int argc, char *argv[]) {
             case SCHED_FIFO:
                 fifo_scheduler(current_time_ms, &ready_queue, &CPU);
                 break;
-
+            case SCHED_SJF:
+                sjf_scheduler(current_time_ms, &ready_queue, &CPU);
+                break;
+            case SCHED_RR:
+                rr_scheduler(current_time_ms, &ready_queue, &CPU, &rr_quantum_used);
+                break;
+            case SCHED_MLFQ:
+                mlfq_scheduler(current_time_ms, &mlfq, &CPU, &mlfq_cpu_queue, &mlfq_quantum_used);
+                break;
             default:
                 printf("Unknown scheduler type\n");
                 break;
