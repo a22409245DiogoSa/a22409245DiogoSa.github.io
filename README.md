@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Aula 3 / Sistemas Operativos – 2025  
 **Repositório:** Aula3-2025  
 **Instituição:** ULHT  - Universidade Lusófona
@@ -92,3 +93,6 @@ Aqui ficam os passos que vamos seguir em aula (conforme o guião):
 
 ---
 
+=======
+# a22409245DiogoSa.github.io
+>>>>>>> cd2884d2bd5aa20b3f3015c6f72e857d90ed3bee
